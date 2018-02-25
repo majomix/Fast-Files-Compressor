@@ -1,9 +1,10 @@
-﻿namespace FastFilesCompressor
+﻿using System;
+using System.Collections.Generic;
+
+namespace FastFilesCompressor
 {
-    public class IndirectFastFile
+    public class IndirectFastFile : FastFile
     {
-        public FastFileHeader Header { get; set; }
-        public byte[] Indirection { get; set; }
-        public FastFile FastFile { get; set; }
+        public byte[] InitialMetaData { get; set; }
     }
 }
