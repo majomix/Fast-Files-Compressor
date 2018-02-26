@@ -52,8 +52,8 @@
     <Compile Include="FastFileCompressor.cs" />
     <Compile Include="FastFileHeader.cs" />
     <Compile Include="FastFileWrapper.cs" />
-    <Compile Include="IndirectFastFile.cs" />
-    <Compile Include="IndirectFastFileWrapper.cs" />
+    <Compile Include="DeltaFastFile.cs" />
+    <Compile Include="DeltaFastFileWrapper.cs" />
     <Compile Include="LZ4Handler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

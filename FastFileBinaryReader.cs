@@ -31,12 +31,12 @@ namespace FastFilesCompressor
 
         public DeltaFastFileWrapper ReadDeltaFastFileWrapper()
         {
-            DeltaFastFileWrapper indirectFastFile = new DeltaFastFileWrapper();
+            DeltaFastFileWrapper deltaFastFileWrapper = new DeltaFastFileWrapper();
 
-            indirectFastFile.Header = ReadFastFileHeader();
-            indirectFastFile.Indirection = ReadBytes(20);
+            deltaFastFileWrapper.Header = ReadFastFileHeader();
+            deltaFastFileWrapper.Indirection = ReadBytes(20);
 
-            return indirectFastFile;
+            return deltaFastFileWrapper;
         }
 
         public FastFile ReadFastFile()

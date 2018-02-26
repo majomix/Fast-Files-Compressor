@@ -40,5 +40,23 @@ namespace FastFilesCompressor
             Write(fastFile.UncompressedFileSize);
             Write(fastFile.CompressionType);
         }
+
+        public void Write(DeltaFastFile fastFile)
+        {
+            Write(fastFile.References.Count());
+            Write(fastFile.CompressedFileSize);
+            Write(fastFile.CompressedFileSize);
+            Write(fastFile.InitialMetaData);
+            Write(fastFile.UncompressedFileSize);
+
+            foreach (byte[] reference in fastFile.References)
+            {
+                Write(reference);
+            }
+
+            Write(fastFile.MetaData);
+            Write(fastFile.UncompressedFileSize);
+            Write(fastFile.CompressionType);
+        }
     }
 }

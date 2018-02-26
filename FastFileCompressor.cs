@@ -5,7 +5,7 @@ namespace FastFilesCompressor
 {
     public class FastFileCompressor
     {
-        public void Decompress(string inputPath, string outputPath)
+        public void DecompressFastFile(string inputPath, string outputPath)
         {
             using (FastFileBinaryReader reader = new FastFileBinaryReader(File.Open(inputPath, FileMode.Open)))
             {
@@ -21,24 +21,19 @@ namespace FastFilesCompressor
             }
         }
 
-        public void DecompressFd(string inputPath, string outputPath)
+        public void DecompressDeltaFastFile(string inputPath, string outputPath)
         {
             using (FastFileBinaryReader reader = new FastFileBinaryReader(File.Open(inputPath, FileMode.Open)))
             {
                 using (FastFileBinaryWriter writer = new FastFileBinaryWriter(File.Open(outputPath, FileMode.Create)))
                 {
-                    DeltaFastFileWrapper indirectFastFile = reader.ReadDeltaFastFileWrapper();
-
-                    indirectFastFile.FastFileWrapper = new FastFileWrapper();
-                    indirectFastFile.FastFileWrapper.Header = reader.ReadFastFileHeader();
-                    indirectFastFile.FastFileWrapper.FastFile = reader.ReadDeltaFastFile();
-
+                    ReadDeltaFastFileWrapper(reader);
                     ChunkHandler.Dechunk(reader, writer);
                 }
             }
         }
 
-        public void Compress(string inputPath, string outputPath)
+        public void CompressFastFile(string inputPath, string outputPath)
         {
             FastFileWrapper fastFile = new FastFileWrapper();
 
@@ -64,6 +59,43 @@ namespace FastFilesCompressor
                     writer.Write(fastFile.FastFile);
                 }
             }
+        }
+
+        public void CompressDeltaFastFile(string inputPath, string outputPath)
+        {
+            DeltaFastFileWrapper deltaFastFile;
+
+            using (FastFileBinaryReader reader = new FastFileBinaryReader(File.Open(outputPath, FileMode.Open)))
+            {
+                deltaFastFile = ReadDeltaFastFileWrapper(reader);
+            }
+
+            using (FastFileBinaryReader reader = new FastFileBinaryReader(File.Open(inputPath, FileMode.Open)))
+            {
+                using (FastFileBinaryWriter writer = new FastFileBinaryWriter(File.Open(outputPath, FileMode.Create)))
+                {
+                    deltaFastFile.FastFileWrapper.FastFile.CompressedFileSize = new FileInfo(Path.ChangeExtension(inputPath, "ff")).Length;
+                    deltaFastFile.FastFileWrapper.FastFile.UncompressedFileSize = reader.BaseStream.Length;
+
+                    writer.Write(deltaFastFile.Header);
+                    writer.Write(deltaFastFile.Indirection);
+                    writer.Write(deltaFastFile.FastFileWrapper.Header);
+                    writer.Write((dynamic)deltaFastFile.FastFileWrapper.FastFile);
+
+                    ChunkHandler.Chunk(reader, writer);
+                }
+            }
+        }
+
+        private DeltaFastFileWrapper ReadDeltaFastFileWrapper(FastFileBinaryReader reader)
+        {
+            DeltaFastFileWrapper deltaFastFile = reader.ReadDeltaFastFileWrapper();
+
+            deltaFastFile.FastFileWrapper = new FastFileWrapper();
+            deltaFastFile.FastFileWrapper.Header = reader.ReadFastFileHeader();
+            deltaFastFile.FastFileWrapper.FastFile = reader.ReadDeltaFastFile();
+
+            return deltaFastFile;
         }
     }
 }
