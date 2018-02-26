@@ -5,9 +5,31 @@ namespace FastFilesCompressor
 {
     public static class ChunkHandler
     {
-        public static Int32 Chunk(BinaryWriter writer)
+        public static void Chunk(FastFileBinaryReader reader, FastFileBinaryWriter writer)
         {
-            return 0;
+            int maximumChunkSize = 65536;
+
+            for (int currentPosition = 0; currentPosition < reader.BaseStream.Length; currentPosition += maximumChunkSize)
+            {
+                int uncompressedChunkSize = (int)reader.BaseStream.Length - currentPosition;
+                if (uncompressedChunkSize > maximumChunkSize)
+                {
+                    uncompressedChunkSize = maximumChunkSize;
+                }
+
+                byte[] inputBuffer = reader.ReadBytes((int)maximumChunkSize);
+                byte[] outputBuffer = new byte[maximumChunkSize * 2];
+
+                int compressedChunkSize = LZ4Handler.LZ4_compress(inputBuffer, outputBuffer, inputBuffer.Length);
+                writer.Write(compressedChunkSize);
+                writer.Write((int)uncompressedChunkSize);
+                writer.Write(outputBuffer, 0, compressedChunkSize);
+
+                if (compressedChunkSize % 4 != 0)
+                {
+                    writer.Write(new byte[4 - compressedChunkSize % 4]);
+                }
+            }
         }
 
         public static void Dechunk(FastFileBinaryReader reader, FastFileBinaryWriter writer)

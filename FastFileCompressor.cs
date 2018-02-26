@@ -40,7 +40,30 @@ namespace FastFilesCompressor
 
         public void Compress(string inputPath, string outputPath)
         {
+            FastFileWrapper fastFile = new FastFileWrapper();
 
+            using (FastFileBinaryReader reader = new FastFileBinaryReader(File.Open(outputPath, FileMode.Open)))
+            {
+                fastFile.Header = reader.ReadFastFileHeader();
+                fastFile.FastFile = reader.ReadFastFileBody();
+            }
+
+            using (FastFileBinaryReader reader = new FastFileBinaryReader(File.Open(inputPath, FileMode.Open)))
+            {
+                using (FastFileBinaryWriter writer = new FastFileBinaryWriter(File.Open(outputPath + "_tmp", FileMode.Create)))
+                {
+                    writer.Write(fastFile.Header);
+                    writer.Write(fastFile.FastFile);
+
+                    ChunkHandler.Chunk(reader, writer);
+
+                    fastFile.FastFile.UncompressedFileSize = reader.BaseStream.Position;
+                    fastFile.FastFile.CompressedFileSize = writer.BaseStream.Position;
+
+                    writer.BaseStream.Seek(36, SeekOrigin.Begin);
+                    writer.Write(fastFile.FastFile);
+                }
+            }
         }
     }
 }
