@@ -14,7 +14,7 @@ namespace FastFilesCompressor
                     FastFileWrapper fastFile = new FastFileWrapper();
 
                     fastFile.Header = reader.ReadFastFileHeader();
-                    fastFile.FastFile = reader.ReadFastFileBody();
+                    fastFile.FastFile = reader.ReadFastFile();
 
                     ChunkHandler.Dechunk(reader, writer);
                 }
@@ -27,11 +27,11 @@ namespace FastFilesCompressor
             {
                 using (FastFileBinaryWriter writer = new FastFileBinaryWriter(File.Open(outputPath, FileMode.Create)))
                 {
-                    IndirectFastFileWrapper indirectFastFile = reader.ReadIndirectFastFile();
+                    DeltaFastFileWrapper indirectFastFile = reader.ReadDeltaFastFileWrapper();
 
                     indirectFastFile.FastFileWrapper = new FastFileWrapper();
                     indirectFastFile.FastFileWrapper.Header = reader.ReadFastFileHeader();
-                    indirectFastFile.FastFileWrapper.FastFile = reader.ReadIndirectFastFileBody();
+                    indirectFastFile.FastFileWrapper.FastFile = reader.ReadDeltaFastFile();
 
                     ChunkHandler.Dechunk(reader, writer);
                 }
@@ -45,7 +45,7 @@ namespace FastFilesCompressor
             using (FastFileBinaryReader reader = new FastFileBinaryReader(File.Open(outputPath, FileMode.Open)))
             {
                 fastFile.Header = reader.ReadFastFileHeader();
-                fastFile.FastFile = reader.ReadFastFileBody();
+                fastFile.FastFile = reader.ReadFastFile();
             }
 
             using (FastFileBinaryReader reader = new FastFileBinaryReader(File.Open(inputPath, FileMode.Open)))

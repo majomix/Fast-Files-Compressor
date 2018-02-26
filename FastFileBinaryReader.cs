@@ -29,9 +29,9 @@ namespace FastFilesCompressor
             return header;
         }
 
-        public IndirectFastFileWrapper ReadIndirectFastFile()
+        public DeltaFastFileWrapper ReadDeltaFastFileWrapper()
         {
-            IndirectFastFileWrapper indirectFastFile = new IndirectFastFileWrapper();
+            DeltaFastFileWrapper indirectFastFile = new DeltaFastFileWrapper();
 
             indirectFastFile.Header = ReadFastFileHeader();
             indirectFastFile.Indirection = ReadBytes(20);
@@ -39,7 +39,7 @@ namespace FastFilesCompressor
             return indirectFastFile;
         }
 
-        public FastFile ReadFastFileBody()
+        public FastFile ReadFastFile()
         {
             FastFile fastFile = new FastFile();
 
@@ -64,9 +64,9 @@ namespace FastFilesCompressor
             return fastFile;
         }
 
-        public IndirectFastFile ReadIndirectFastFileBody()
+        public DeltaFastFile ReadDeltaFastFile()
         {
-            IndirectFastFile fastFile = new IndirectFastFile();
+            DeltaFastFile fastFile = new DeltaFastFile();
 
             long numberOfEntries = ReadInt32();
             fastFile.CompressedFileSize = ReadInt64();

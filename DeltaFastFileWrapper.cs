@@ -1,6 +1,6 @@
 ﻿namespace FastFilesCompressor
 {
-    public class IndirectFastFileWrapper
+    public class DeltaFastFileWrapper
     {
         public FastFileHeader Header { get; set; }
         public byte[] Indirection { get; set; }
